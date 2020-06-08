@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block head_title %}
+Welcome
+{% endblock head_title %}
+
+{% block content %}
+{% for mytweet in mytweets %}
+    {{ mytweet.content }} 
+{% endfor %}
+
+    Hi You, this is TweetMe and you're Welcome here ...
+
+    <div id='tweets'>
+        Replace me
+    </div>
+
+    <script>
+
+
+      // ---------------------------------      
+       function handleLike(tweet_id, tweet_likes){
+            console.log(tweet_id, tweet_likes)
+       }
+      // ---------------------------------      
+
+      // ---------------------------------
+        function likeBtn(tweet){
+            return "<button class='btn btn-primary' \
+                    onclick='handleLike("+tweet.id+","+tweet.likes+")'>"+tweet.likes+
+                    " Likes</button>"
+        }
+      // ---------------------------------      
+
+      // ---------------------------------
+        function formatTweetElement(tweet){
+            var formattedTweet = "<div class='mb-4 tweet' id='" +tweet.id+"'>"+
+                "<p>"+tweet.content+"</p>"+
+                "<div class='btn-group'>"+likeBtn(tweet)+"</div></div>"
+            return formattedTweet
+        } // -----------------------------------------------------------        
+
+        const tweetsElement = document.getElementById("tweets")
+        const xhr = new XMLHttpRequest()
+        const method = 'GET'
+        const url = "tweets/"
+        const responseType = "json"
+        xhr.responseType = responseType
+        xhr.open(method, url)
+        xhr.onload = function(){
+            var finalTweetStr = ""            
+            const serverResponse = xhr.response
+            var listedItems = serverResponse.response; var i;
+            for (i=0; i<listedItems.length;i++){
+                var tweetObj = listedItems[i]
+                //console.log(tweetObj.id)
+                finalTweetStr += formatTweetElement(tweetObj)
+            }
+            tweetsElement.innerHTML = finalTweetStr
+        }
+        xhr.send()
+
+    </script>
+
+{% endblock content %}
+
