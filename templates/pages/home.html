@@ -1,17 +1,33 @@
 {% extends 'base.html' %}
 
 {% block head_title %}
-Welcome
+    Welcome
 {% endblock head_title %}
 
 {% block content %}
-{% for mytweet in mytweets %}
-    {{ mytweet.content }} 
-{% endfor %}
 
-    Hi You, this is TweetMe and you're Welcome here ...
+    {% for mytweet in mytweets %}
+        {{ mytweet.content }} 
+    {% endfor %}
 
-    <div id='tweets'>
+    <div class='row text-center'>
+        <div class='col'>
+            <h2>Hi there, you're welcome in TweetMe ... </h2>
+        </div>
+    </div>
+
+    <div class='row mb-3'>
+        <div class='col-md-4 mx-auto col-10'>
+            <form class='form' method='POST' action='/create-tweet/'>
+                {% csrf_token %}
+                <input type='hidden' value='/' name='next'/>
+                <textarea class='form-control' name='content' placeholder='Your tweet ...'></textarea>
+                <button type='submit' class='btn btn-primary'>Tweet</button>
+            </form>
+        </div>
+    </div>
+
+    <div class='row' id='tweets'>
         Replace me
     </div>
 
@@ -34,7 +50,8 @@ Welcome
 
       // ---------------------------------
         function formatTweetElement(tweet){
-            var formattedTweet = "<div class='mb-4 tweet' id='" +tweet.id+"'>"+
+            var formattedTweet = "<div class='col-12 col-md-10 mx-auto border rounded \
+                py-3 mb-4 tweet' id='" +tweet.id+"'>"+
                 "<p>"+tweet.content+"</p>"+
                 "<div class='btn-group'>"+likeBtn(tweet)+"</div></div>"
             return formattedTweet
@@ -59,7 +76,6 @@ Welcome
             tweetsElement.innerHTML = finalTweetStr
         }
         xhr.send()
-
     </script>
 
 {% endblock content %}

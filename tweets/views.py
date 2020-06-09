@@ -1,11 +1,18 @@
+from django.utils.http import is_safe_url
+from django.conf import settings
 import random
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, JsonResponse
+from .forms import TweetForm
 from .models import Tweet
+
+
+
+ALLOWED_HOSTS = settings.ALLOWED_HOSTS
+
 
 # Create your views here.
 # I know
-
 def home_view(request, *args, **kwargs):
     return render(request, "pages/home.html", context={}, status=200)
 
@@ -14,10 +21,7 @@ def tweet_list_view(request, *args, **kwargs):
     # print (args, kwargs)
     # return HttpResponse("<h1> Hello jma3a zina </h1>")
     mytweets = Tweet.objects.all()
-    tweet_list = [{"id":my.id, "content":my.content, "likes":random.randint(0, 1000)} for my in mytweets]
-    #tweet_list = [{"id":my.id, "content":my.content, "likes":112} for my in mytweets]
-    # for mytweet in mytweets:
-    # tweet_list = tweet_list.append(mytweet)    
+    tweet_list = [{"id":my.id, "content":my.content, "likes":random.randint(0, 1000)} for my in mytweets]  
     data = {
         "isUser":False,
         "response": tweet_list,
@@ -55,3 +59,15 @@ def del_tweet(request, tweet_id):
     obj = Tweet.objects.get(id=tweet_id)
     obj.delete()
     return HttpResponse(f"<h1> We deleted the tweet  {obj} </h1>")    
+
+def tweet_create_view(request, *args, **kwargs):
+    form = TweetForm(request.POST or None)
+    next_url = request.POST.get("next") or None
+    print ('next_url = ', next_url)
+    if form.is_valid() and is_safe_url(next_url, ALLOWED_HOSTS):
+        obj = form.save(commit=False)
+        obj.save()
+        if next_url!=None:
+            return redirect(next_url)
+        form = TweetForm()
+    return render(request, 'components/form.html', context={"form":form})
